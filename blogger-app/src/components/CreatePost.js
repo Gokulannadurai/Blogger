@@ -2,6 +2,26 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BlogContext } from '../contexts/BlogContext';
 
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper'; // For form background
+
+// Icons
+import DeleteIcon from '@mui/icons-material/Delete';
+import UploadFileIcon from '@mui/icons-material/UploadFile'; // For file uploads
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'; // For image uploads
+
 const CreatePost = () => {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -9,7 +29,7 @@ const CreatePost = () => {
   const [currentImageNames, setCurrentImageNames] = useState([]);
   const [documentFile, setDocumentFile] = useState(null);
   const [currentDocumentName, setCurrentDocumentName] = useState('');
-  const [layoutType, setLayoutType] = useState('image-top'); // New state for layout
+  const [layoutType, setLayoutType] = useState('image-top');
 
   const { posts, addPost, updatePost } = useContext(BlogContext);
   const navigate = useNavigate();
@@ -21,194 +41,216 @@ const CreatePost = () => {
       if (postToEdit) {
         setTitle(postToEdit.title);
         setContent(postToEdit.content);
-
-        // Handle imageFiles for editing
-        if (postToEdit.imageFiles && postToEdit.imageFiles.length > 0) {
-          setImageFiles(postToEdit.imageFiles.filter(f => f instanceof File)); // Ensure they are files
-          setCurrentImageNames(postToEdit.imageFiles.map(f => f.name).filter(name => name));
-        } else if (postToEdit.imageFile instanceof File) { // Backward compatibility
-          setImageFiles([postToEdit.imageFile]);
-          setCurrentImageNames([postToEdit.imageFile.name]);
+        // Assuming imageFiles in context are File objects or can be reconstructed as such if needed.
+        // For simplicity, we're not trying to re-populate the FileList objects for editing existing images here.
+        // We'll keep existing image names if they are stored as strings or some other reference.
+        // This example focuses on uploading new images or replacing all.
+        // A more complex scenario would handle individual image additions/removals from an existing set.
+        if (postToEdit.imageFiles && Array.isArray(postToEdit.imageFiles)) {
+            // If imageFiles are actual File objects (e.g., from a previous edit session not yet saved)
+            const fileObjects = postToEdit.imageFiles.filter(f => f instanceof File);
+            setImageFiles(fileObjects);
+            setCurrentImageNames(fileObjects.map(f => f.name));
         } else {
-          setImageFiles([]);
-          setCurrentImageNames([]);
+            // If imageFiles are just names/URLs from saved post, display them but don't add to imageFiles state
+            // This part might need adjustment based on how `postToEdit.imageFiles` is structured for saved posts.
+            // For now, we assume `currentImageNames` is primarily for newly staged files.
+             setCurrentImageNames(postToEdit.imageFiles ? postToEdit.imageFiles.map(f => typeof f === 'string' ? f : f.name) : []);
         }
+
 
         if (postToEdit.documentFile instanceof File) {
           setDocumentFile(postToEdit.documentFile);
           setCurrentDocumentName(postToEdit.documentFile.name);
+        } else if (typeof postToEdit.documentFile === 'string') { // Assuming name is stored if not a File object
+            setCurrentDocumentName(postToEdit.documentFile);
         } else {
           setDocumentFile(null);
           setCurrentDocumentName('');
         }
-        setLayoutType(postToEdit.layoutType || 'image-top'); // Load layout type
+        setLayoutType(postToEdit.layoutType || 'image-top');
       } else {
-        console.warn(`Post with ID ${postId} not found for editing.`);
         navigate('/');
       }
-    } else if (!postId) {
-      // Resetting form for new post
+    } else {
       setTitle('');
       setContent('');
       setImageFiles([]);
       setCurrentImageNames([]);
       setDocumentFile(null);
       setCurrentDocumentName('');
-      setLayoutType('image-top'); // Default layout for new post
+      setLayoutType('image-top');
     }
   }, [postId, posts, navigate]);
 
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files.length > 0) {
       const filesArray = Array.from(event.target.files);
-      setImageFiles(prevFiles => [...prevFiles, ...filesArray]); // Append new files
-      setCurrentImageNames(prevNames => [...prevNames, ...filesArray.map(f => f.name)]);
-    } else if (event.target.files && event.target.files.length === 0 && postId) {
-      // If editing and user cancels, it implies they might want to clear *newly added* files for this session.
-      // Existing files (already part of the post) should be handled differently, perhaps with a separate "remove" button per image.
-      // For simplicity, this basic implementation will clear all staged files if selection is cancelled.
-      // A more robust solution would distinguish between already uploaded and newly staged files.
-      setImageFiles([]);
-      setCurrentImageNames([]);
-    } else if (event.target.files && event.target.files.length === 0 && !postId) {
-        // If creating a new post and user cancels, clear the selection
-        setImageFiles([]);
-        setCurrentImageNames([]);
+      // Filter out duplicates by name before adding
+      const newFiles = filesArray.filter(newFile => !imageFiles.some(existingFile => existingFile.name === newFile.name));
+      const newFileNames = newFiles.map(f => f.name);
+
+      setImageFiles(prevFiles => [...prevFiles, ...newFiles]);
+      setCurrentImageNames(prevNames => [...prevNames, ...newFileNames]);
     }
-    // To allow re-selecting the same file(s) if removed and then added again
-    event.target.value = null;
+    event.target.value = null; // Allow re-selecting the same file(s)
   };
 
-  // Function to remove a specific image from the selection
-  const removeImage = (index) => {
-    setImageFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
-    setCurrentImageNames(prevNames => prevNames.filter((_, i) => i !== index));
+  const removeImage = (indexToRemove) => {
+    setImageFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove));
+    setCurrentImageNames(prevNames => prevNames.filter((_, index) => index !== indexToRemove));
   };
 
   const handleDocumentChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       setDocumentFile(event.target.files[0]);
       setCurrentDocumentName(event.target.files[0].name);
-    } else if (event.target.files && event.target.files.length === 0) {
+    } else {
       setDocumentFile(null);
       setCurrentDocumentName('');
     }
+    event.target.value = null; // Allow re-selecting the same file
+  };
+
+  const removeDocument = () => {
+    setDocumentFile(null);
+    setCurrentDocumentName('');
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    let targetPostId = postId;
+    const postData = {
+      title,
+      content,
+      imageFiles, // Pass File objects for new/updated images
+      documentFile, // Pass File object for new/updated document
+      layoutType,
+    };
 
     if (postId) {
-      const updatedPostData = {
-        title,
-        content,
-        imageFiles,
-        documentFile,
-        layoutType, // Include layout type
-      };
-      updatePost(postId, updatedPostData);
-      console.log('Updating post with ID:', postId, updatedPostData);
+      updatePost(postId, postData);
     } else {
-      const newPostData = {
-        title,
-        content,
-        imageFiles,
-        documentFile,
-        layoutType, // Include layout type
-      };
-      const newPost = addPost(newPostData);
-      targetPostId = newPost.id;
-      console.log('Creating new post:', newPostData);
+      const newPost = addPost(postData); // addPost should ideally return the new post with ID
+      // navigate(`/post/${newPost.id}`); // Navigate after getting ID
     }
-
-    // Reset form fields
+    // Resetting form fields - consider if navigation should happen first or if ID is needed
     setTitle('');
     setContent('');
     setImageFiles([]);
     setCurrentImageNames([]);
     setDocumentFile(null);
     setCurrentDocumentName('');
-    setLayoutType('image-top'); // Reset layout type
-    // event.target.reset();
+    setLayoutType('image-top');
 
-    if (targetPostId) {
-      navigate(`/post/${targetPostId}`);
+    if(!postId) {
+        // For new post, navigate to home or new post page if ID is available
+        navigate('/'); // Or /post/newPostId if addPost returns it and it's handled
     } else {
-      navigate('/');
+        // For edited post, navigate to the post's page
+        navigate(`/post/${postId}`);
     }
   };
 
   return (
-    <div>
-      <h2>{postId ? 'Edit Post' : 'Create New Post'}</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="title">Title:</label>
-          <input
-            type="text"
-            id="title"
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      <Paper elevation={2} sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
+        <Typography variant="h4" component="h1" gutterBottom sx={{ mb: 3, textAlign: 'center' }}>
+          {postId ? 'Edit Post' : 'Create New Post'}
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <TextField
+            label="Title"
+            variant="outlined"
+            fullWidth
+            required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            required
+            sx={{ mb: 3 }}
           />
-        </div>
-        <div>
-          <label htmlFor="content">Content:</label>
-          <textarea
-            id="content"
+          <TextField
+            label="Content"
+            variant="outlined"
+            fullWidth
+            required
+            multiline
+            rows={10}
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows="10"
-            required
+            sx={{ mb: 3 }}
           />
-        </div>
-        <div>
-          <label htmlFor="layoutType">Layout:</label>
-          <select id="layoutType" value={layoutType} onChange={(e) => setLayoutType(e.target.value)}>
-            <option value="image-top">Image Top, Text Below</option>
-            <option value="image-left">Image Left, Text Right</option>
-            <option value="image-right">Image Right, Text Left</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="imageUpload">Images:</label>
-          <input
-            type="file"
-            id="imageUpload"
-            accept="image/*"
-            multiple // Allow multiple file selection
-            onChange={handleImageChange}
-          />
-          {currentImageNames.length > 0 && (
-            <div style={{marginTop: '10px'}}>
-              <p style={{fontSize: '0.9em', color: '#555', marginBottom: '0.5rem'}}>Selected images:</p>
-              <ul className="selected-images-list">
+          <FormControl fullWidth sx={{ mb: 3 }}>
+            <InputLabel id="layout-type-label">Layout</InputLabel>
+            <Select
+              labelId="layout-type-label"
+              id="layoutType"
+              value={layoutType}
+              label="Layout"
+              onChange={(e) => setLayoutType(e.target.value)}
+            >
+              <MenuItem value="image-top">Image Top, Text Below</MenuItem>
+              <MenuItem value="image-left">Image Left, Text Right</MenuItem>
+              <MenuItem value="image-right">Image Right, Text Left</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Box sx={{ mb: 3, p: 2, border: '1px dashed grey', borderRadius: 1 }}>
+            <Button variant="outlined" component="label" startIcon={<AddPhotoAlternateIcon />} fullWidth>
+              Upload Images
+              <input type="file" hidden multiple onChange={handleImageChange} accept="image/*" />
+            </Button>
+            {currentImageNames.length > 0 && (
+              <List dense sx={{mt: 1}}>
                 {currentImageNames.map((name, index) => (
-                  <li key={index}>
-                    <span>{name}</span>
-                    <button type="button" onClick={() => removeImage(index)}>
-                      Remove
-                    </button>
-                  </li>
+                  <ListItem
+                    key={index}
+                    secondaryAction={
+                      <IconButton edge="end" aria-label="delete image" onClick={() => removeImage(index)}>
+                        <DeleteIcon />
+                      </IconButton>
+                    }
+                    sx={{ bgcolor: 'action.hover', borderRadius: 1, mb: 0.5 }}
+                  >
+                    <ListItemText primary={name} />
+                  </ListItem>
                 ))}
-              </ul>
-            </div>
-          )}
-        </div>
-        <div>
-          <label htmlFor="documentUpload">Document:</label>
-          <input
-            type="file"
-            id="documentUpload"
-            accept=".pdf,.doc,.docx,.txt"
-            onChange={handleDocumentChange}
-          />
-          {currentDocumentName && <p style={{fontSize: '0.9em', color: '#555'}}>Current: {currentDocumentName}</p>}
-        </div>
-        <button type="submit">{postId ? 'Update Post' : 'Create Post'}</button>
-      </form>
-    </div>
+              </List>
+            )}
+          </Box>
+
+          <Box sx={{ mb: 3, p: 2, border: '1px dashed grey', borderRadius: 1 }}>
+            <Button variant="outlined" component="label" startIcon={<UploadFileIcon />} fullWidth>
+              Upload Document
+              <input type="file" hidden onChange={handleDocumentChange} accept=".pdf,.doc,.docx,.txt" />
+            </Button>
+            {currentDocumentName && (
+              <List dense sx={{mt: 1}}>
+                <ListItem
+                  secondaryAction={
+                    <IconButton edge="end" aria-label="delete document" onClick={removeDocument}>
+                      <DeleteIcon />
+                    </IconButton>
+                  }
+                  sx={{ bgcolor: 'action.hover', borderRadius: 1 }}
+                >
+                  <ListItemText primary={currentDocumentName} />
+                </ListItem>
+              </List>
+            )}
+          </Box>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            size="large"
+            fullWidth
+            sx={{ py: 1.5 }}
+          >
+            {postId ? 'Update Post' : 'Create Post'}
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 };
 

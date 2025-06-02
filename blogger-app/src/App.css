@@ -3,332 +3,35 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background-color: #f4f7f6; /* Consistent with index.css */
+  background-color: #f4f7f6; /* Consistent with index.css, though CssBaseline also sets a theme background */
 }
 
-/* Header Styling */
-header {
-  background-color: #ffffff;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #e0e0e0;
-}
+/*
+  Removed custom button styles (button, .button-link, .secondary, .danger)
+  as MUI Button components are now used throughout the application and handle their own styling and variants.
+*/
 
-header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-  color: #333;
-}
+/*
+  Removed Form Styling as CreatePost.js now uses Material UI components.
+*/
 
-header h1 a {
-  color: inherit;
-  text-decoration: none;
-}
+/*
+  Removed BlogPostList Specific Styles as MUI Card and Grid are used now.
+*/
 
-header nav ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 1.5rem;
-}
+/*
+  Removed BlogPost Specific Styles as MUI components and sx prop are used now.
+*/
 
-header nav ul li a {
-  text-decoration: none;
-  color: #007bff;
-  font-weight: 500;
-  transition: color 0.2s ease-in-out;
-}
-
-header nav ul li a:hover,
-header nav ul li a.active {
-  color: #0056b3;
-  text-decoration: underline;
-}
-
-/* Main Content Area */
-main {
-  flex-grow: 1;
-  padding: 2rem;
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto; /* Center content */
-}
-
-/* Footer Styling */
-footer {
-  background-color: #343a40;
-  color: #ffffff;
-  text-align: center;
-  padding: 1.5rem 2rem;
-  margin-top: auto; /* Pushes footer to bottom */
-}
-
-footer p {
-  margin: 0;
-}
-
-/* Button Styling */
-button,
-.button-link {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  text-decoration: none; /* For .button-link */
-  display: inline-block; /* For .button-link */
-  transition: background-color 0.2s ease-in-out;
-  text-align: center;
-}
-
-button:hover,
-.button-link:hover {
-  background-color: #0056b3;
-  color: white; /* Ensure text color remains white on hover */
-  text-decoration: none; /* For .button-link */
-}
-
-button.secondary {
-  background-color: #6c757d;
-}
-
-button.secondary:hover {
-  background-color: #545b62;
-}
-
-button.danger {
-  background-color: #dc3545;
-}
-button.danger:hover {
-  background-color: #c82333;
-}
+/*
+  Removed CreatePost.js - Selected files display styles as MUI List is used now.
+*/
 
 
-/* Form Styling */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  background-color: #ffffff;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-form div {
-  display: flex;
-  flex-direction: column;
-}
-
-form label {
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #333;
-}
-
-form input[type="text"],
-form input[type="file"],
-form textarea,
-form select {
-  padding: 0.75rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  font-size: 1rem;
-  width: 100%; /* Make form elements take full width of their container */
-}
-
-form input[type="file"] {
-  padding: 0.4rem; /* Specific padding for file inputs */
-}
-
-form textarea {
-  min-height: 150px;
-  resize: vertical;
-}
-
-form button[type="submit"] {
-  align-self: flex-start; /* Align button to the left */
-  margin-top: 1rem;
-}
-
-/* BlogPostList Specific Styles */
-.blog-post-list article {
-  background-color: #ffffff;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: box-shadow 0.3s ease;
-}
-
-.blog-post-list article:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-}
-
-.blog-post-list h3 {
-  margin-top: 0;
-  color: #333;
-}
-
-.blog-post-list .post-actions {
-  margin-top: 1rem;
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-/* BlogPost Specific Styles */
-.blog-post-content h1 {
-  color: #212529;
-  margin-bottom: 1rem;
-}
-
-.blog-post-content .image-gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.blog-post-content .image-gallery img {
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.blog-post-content .text-content p {
-  line-height: 1.7;
-  color: #495057;
-  margin-bottom: 1rem;
-}
-
-.blog-post-content .document-link a {
-  font-weight: 500;
-}
-
-.blog-post-actions {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #eee;
-  display: flex;
-  gap: 1rem;
-}
-
-
-/* CreatePost.js - Selected files display */
-.selected-images-list {
-  list-style-type: none;
-  padding-left: 0;
-  margin-top: 0.5rem;
-}
-.selected-images-list li {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.9em;
-  padding: 0.3rem 0.5rem;
-  background-color: #e9ecef;
-  border-radius: 4px;
-  margin-bottom: 0.3rem;
-}
-.selected-images-list li button {
-  padding: 0.2rem 0.5rem;
-  font-size: 0.8em;
-  background-color: #dc3545; /* Danger button */
-}
-.selected-images-list li button:hover {
-  background-color: #c82333;
-}
-
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  header {
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1rem;
-  }
-
-  header nav ul {
-    margin-top: 0.5rem; /* Reduced margin */
-    flex-direction: column; /* Stack nav items */
-    gap: 0.5rem; /* Reduced gap */
-    width: 100%; /* Full width for stacked nav */
-  }
-  header nav ul li a {
-    display: block; /* Make links take full width */
-    padding: 0.5rem 0; /* Add some padding */
-  }
-
-  main {
-    padding: 1rem;
-  }
-
-  form {
-    padding: 1.5rem;
-  }
-
-  /* Responsive BlogPost layout - stack image-left/right */
-  .blog-post-content .content-wrapper[style*="flex-direction: row"],
-  .blog-post-content .content-wrapper[style*="flex-direction: row-reverse"] {
-    flex-direction: column !important; /* Override inline style */
-  }
-  .blog-post-content .content-wrapper[style*="flex-direction: column"] .image-gallery,
-  .blog-post-content .content-wrapper[style*="flex-direction: column"] .text-content {
-    flex: none !important; /* Reset flex basis for stacked items */
-    width: 100% !important;
-  }
-  .blog-post-content .image-gallery img {
-     max-width: 100% !important; /* Ensure images in top/bottom layouts also scale */
-  }
-
-  .blog-post-list .post-actions {
-    flex-direction: column; /* Stack actions on small screens */
-    align-items: flex-start;
-  }
-  .blog-post-list .post-actions .button-link,
-  .blog-post-list .post-actions button {
-    width: 100%; /* Make buttons full width */
-    margin-bottom: 0.5rem; /* Add some space between stacked buttons */
-  }
-   .blog-post-list .post-actions .button-link:last-child,
-   .blog-post-list .post-actions button:last-child {
-    margin-bottom: 0;
-  }
-
-  .blog-post-actions {
-    flex-direction: column;
-  }
-  .blog-post-actions .button-link,
-  .blog-post-actions button {
-     width: 100%;
-     margin-bottom: 0.5rem;
-  }
-  .blog-post-actions .button-link:last-child,
-  .blog-post-actions button:last-child {
-    margin-bottom: 0;
-  }
-
-
-}
-
-@media (max-width: 480px) {
-  header h1 {
-    font-size: 1.5rem;
-  }
-  main {
-    padding: 0.5rem;
-  }
-  form {
-    padding: 1rem;
-  }
-  button, .button-link {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-  }
-}
+/*
+  Responsive Design section cleaned up.
+  Most responsive adjustments are now handled by Material UI's Grid system,
+  component props (like for AppBar), or sx prop with theme breakpoints.
+*/
+/* @media (max-width: 768px) { ... } */
+/* @media (max-width: 480px) { ... } */
