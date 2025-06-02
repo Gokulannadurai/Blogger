@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { BlogContext } from '../contexts/BlogContext';
 
 const BlogPostList = () => {
-  const { posts } = useContext(BlogContext);
+  const { posts, deletePost } = useContext(BlogContext);
 
   if (!posts || posts.length === 0) {
     return (
@@ -14,14 +14,21 @@ const BlogPostList = () => {
   }
 
   return (
-    <div>
+    <div className="blog-post-list">
       <h2>Blog Posts</h2>
       {posts.map(post => (
-        <article key={post.id} style={{ borderBottom: '1px solid #ccc', marginBottom: '20px', paddingBottom: '20px' }}>
+        <article key={post.id}>
           <h3>{post.title}</h3>
-          <Link to={`/post/${post.id}`}>Read More</Link>
-          {' | '}
-          <Link to={`/edit/${post.id}`}>Edit</Link>
+          {/* Optional: Add a short snippet of post.content here if desired */}
+          <div className="post-actions">
+            <Link to={`/post/${post.id}`} className="button-link">Read More</Link>
+            <Link to={`/edit/${post.id}`} className="button-link secondary">Edit</Link>
+            <button className="danger" onClick={() => {
+              if (window.confirm('Are you sure you want to delete this post?')) {
+                deletePost(post.id);
+              }
+            }}>Delete</button>
+          </div>
         </article>
       ))}
     </div>
